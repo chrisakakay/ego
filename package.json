@@ -9,10 +9,7 @@
     "fs-extra": "^10.0.1",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
-    "livereload": "^0.9.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "styled-components": "^5.3.3"
+    "livereload": "^0.9.3"
   },
   "scripts": {
     "dev": "node index.js",
