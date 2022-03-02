@@ -1,6 +1,6 @@
 {
   "name": "ego",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "bin": "./cli.js",
@@ -11,7 +11,8 @@
     "koa": "^2.13.4",
     "koa-mount": "^4.0.0",
     "koa-static": "^5.0.0",
-    "livereload": "^0.9.3"
+    "livereload": "^0.9.3",
+    "yargs": "^17.3.1"
   },
   "author": "",
   "license": "MIT"

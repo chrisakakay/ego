@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-const args = process.argv.slice(2);
-const buildOnly = args[0] === 'build';
+const yargs = require('yargs/yargs');
+const argv = yargs(process.argv.slice(2)).argv;
+const buildOnly = argv._[0] === 'build';
 
 const server = require('./webserver.js');
 const webopen = require('./webopen.js');
@@ -14,8 +15,7 @@ let livereloadServer;
 
 const config = {
   buildPath: './dist',
-  //publicUrl: '/',
-  publicUrl: '/mobi/',
+  publicUrl: argv.publicUrl || '/',
   htmlFiles: [
     { entryPoint: './src/index.html', outPoint: './dist/index.html' }
   ],
@@ -35,8 +35,8 @@ const config = {
     livereload: true,
     watch: true,
     serve: true,
-    open: true,
-    port: 8080
+    open: argv.open || true,
+    port: argv.port || 8080
   }
 };
 
@@ -46,11 +46,13 @@ static.copy(config);
 if (!buildOnly) {
   if (config.dev.livereload) livereloadServer = livereload.start();
   if (config.dev.serve) server.start(config);
-  if (config.dev.open) webopen.start(config);
   if (config.dev.watch) {
     watcher.start({ onChange: () => {
-      builder.generate(config, () => { if (livereloadServer) livereloadServer.refresh('/'); })
-      static.copy(config);
+      builder.generate(config, () => {
+        static.copy(config);
+        if (livereloadServer) livereloadServer.refresh('/');
+      })
     }});
   }
+  if (config.dev.open) webopen.start(config);
 }
