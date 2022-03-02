@@ -2,14 +2,14 @@
   "name": "ego",
   "version": "0.1.4",
   "description": "",
-  "bin": {
-    "ego": "index.js"
-  },
+  "main": "index.js",
+  "bin": "./cli.js",
   "dependencies": {
     "chokidar": "^3.5.3",
     "esbuild": "^0.14.13",
     "fs-extra": "^10.0.1",
     "koa": "^2.13.4",
+    "koa-mount": "^4.0.0",
     "koa-static": "^5.0.0",
     "livereload": "^0.9.3"
   },
