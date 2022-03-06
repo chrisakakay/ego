@@ -18,7 +18,7 @@ module.exports.start = (config) => {
     ctx.body = fs.createReadStream(path.join(config.esbuild.outdir, 'index.html'));
   });
 
-  app.listen(config.dev.port);
+  app.listen(config.port);
 
-  console.log(`Starting dev server on port: ${config.dev.port}`);
+  console.log(`Starting dev server on port: ${config.port}`);
 }

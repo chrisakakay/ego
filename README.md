@@ -15,16 +15,15 @@ Usage for dev env:
 - `ego --open --port 8080`
 
 Supported flags (configuration):
-- `--public-url` - change the base url from `/` to something like `/myapp/`
+- `--outdir` - (default: `./dist`) change the build folder
+- `--staticdir` - (default: `./static`) change the static folder
+- `--public-url` - (default: `/`) change the base url
+- `--minify` - (default: `true`) change the base url
 
 Dev only flags:
-- `--port` - dev server port
-- `--open` - opening the page in a browser
+- `--port` - (default: `8080`) dev server port
+- `--open` - (default: `false`) opening the page in a browser
 
 TODO:
-- [ ] add a flag to change the build folder
-- [ ] add a flag to change the static folder
-- [ ] add option to control esbuild minify flag
-- [ ] add option to control esbuild bundle flag
 - [ ] add an `init` command to create a base file structure
 - [ ] consider adding a package to handle `--open` more gracefully (currently only win/osx support)

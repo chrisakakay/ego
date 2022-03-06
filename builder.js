@@ -7,11 +7,16 @@ const build = async (config, callback) => {
   const hrstart = process.hrtime();
 
   if (!config.buildOnly) {
-    const files = fs.readdirSync(config.esbuild.outdir).filter(fn => fn.endsWith('.js'));
+    const files = fs.readdirSync(config.esbuild.outdir).filter(fn => fn.startsWith('index.') && fn.endsWith('.js'));
     for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)) }
   }
 
   let result = await esbuild.build(config.esbuild).catch(() => {});
+
+  // https://esbuild.github.io/api/#analyze
+  // -> config.metafile = true
+  // let text = await esbuild.analyzeMetafile(result.metafile)
+  // console.log(text)
 
   const hashSum = crypto.createHash('md5');
   hashSum.update(result.outputFiles[0].contents);
@@ -20,7 +25,7 @@ const build = async (config, callback) => {
 
   let html = await fs.readFileSync(config.entryPoint, 'utf8');
   html = html.replace(`src="./index.jsx"`, `src="${path.join(config.publicUrl, `index.${hex}.js`)}"`);
-  if (!config.buildOnly && config.dev.livereload) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
+  if (!config.buildOnly) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
   await fs.writeFileSync(path.join(config.esbuild.outdir, 'index.html'), html, { encoding: 'utf8' });
 
   const hrend = process.hrtime(hrstart);
@@ -30,7 +35,7 @@ const build = async (config, callback) => {
 }
 
 const copyStaticFolder = async (config) => {
-  await fs.copySync(config.staticFolder, config.esbuild.outdir);
+  if (fs.existsSync(config.staticFolder)) await fs.copySync(config.staticFolder, config.esbuild.outdir);
 }
 
 const init = async (config) => {
@@ -42,7 +47,7 @@ const init = async (config) => {
 
   await copyStaticFolder(config);
 
-  if (!config.buildOnly && config.dev.watch) {
+  if (!config.buildOnly) {
     const chokidar = require('chokidar');
     const livereload = require('livereload');
     const livereloadServer = livereload.createServer();

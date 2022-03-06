@@ -3,7 +3,7 @@
 const yargs = require('yargs/yargs');
 const argv = yargs(process.argv.slice(2)).argv;
 
-const server = require('./webserver.js');
+const server = require('./server.js');
 const builder = require('./builder.js');
 
 const buildOnly = argv._[0] === 'build';
@@ -12,24 +12,18 @@ let livereloadServer;
 const config = {
   publicUrl: argv.publicUrl || '/',
   entryPoint: './src/index.html',
-  staticFolder: './static',
+  staticFolder: argv.staticdir || './static',
   buildOnly: buildOnly,
+  port: argv.port || 8080,
   esbuild: {
     entryPoints: ["./src/index.jsx"],
-    outdir: './dist',
-    minify: true,
+    outdir: argv.outdir || './dist',
+    minify: argv.minify === undefined ? true : argv.minify !== 'false',
     bundle: true,
     write: false,
     define: {
       'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"'
     }
-  },
-  dev: {
-    livereload: true,
-    watch: true,
-    serve: true,
-    open: argv.open || false,
-    port: argv.port || 8080
   }
 };
 
@@ -39,9 +33,9 @@ builder.build(config);
 if (!buildOnly) {
   server.start(config);
 
-  if (config.dev.open) {
+  if (argv.open) {
     const cp = require('child_process');
-    if (process.platform === 'darwin') cp.exec(`open http://localhost:${config.dev.port}${config.publicUrl}`);
-    if (process.platform === 'win32') cp.exec(`start http://localhost:${config.dev.port}${config.publicUrl}`);
+    if (process.platform === 'darwin') cp.exec(`open http://localhost:${config.port}${config.publicUrl}`);
+    if (process.platform === 'win32') cp.exec(`start http://localhost:${config.port}${config.publicUrl}`);
   }
 }
