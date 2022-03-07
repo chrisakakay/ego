@@ -5,9 +5,9 @@ const esbuild = require('esbuild');
 
 let firstBuildResult;
 const getBuildResult = async (config) => {
-  if (firstBuildResult)  return await firstBuildResult.rebuild();
+  if (firstBuildResult)  return await firstBuildResult.rebuild().catch(() => {});
 
-  firstBuildResult = await esbuild.build(config.esbuild);
+  firstBuildResult = await esbuild.build(config.esbuild).catch(() => {});
   return firstBuildResult;
 }
 
@@ -20,6 +20,7 @@ const build = async (config, callback) => {
   }
 
   let result = await getBuildResult(config);
+  if (result === undefined) return;
 
   if (config.buildOnly && config.esbuild.metafile) {
     const metaText = await esbuild.analyzeMetafile(result.metafile)
