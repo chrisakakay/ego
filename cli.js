@@ -21,6 +21,8 @@ const config = {
     minify: argv.minify === undefined ? true : argv.minify !== 'false',
     bundle: true,
     write: false,
+    incremental: buildOnly ? false : true,
+    metafile: argv.analyze !== undefined,
     define: {
       'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"'
     }

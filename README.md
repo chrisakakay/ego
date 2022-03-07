@@ -18,7 +18,10 @@ Supported flags (configuration):
 - `--outdir` - (default: `./dist`) change the build folder
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
-- `--minify` - (default: `true`) change the base url
+- `--minify` - (default: `true`) change minification
+
+Build only flags:
+- `--analyze` - (default: `false`) show a report of the bundle content
 
 Dev only flags:
 - `--port` - (default: `8080`) dev server port

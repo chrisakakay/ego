@@ -3,6 +3,14 @@ const path = require('path');
 const crypto = require('crypto');
 const esbuild = require('esbuild');
 
+let firstBuildResult;
+const getBuildResult = async (config) => {
+  if (firstBuildResult)  return await firstBuildResult.rebuild();
+
+  firstBuildResult = await esbuild.build(config.esbuild);
+  return firstBuildResult;
+}
+
 const build = async (config, callback) => {
   const hrstart = process.hrtime();
 
@@ -11,12 +19,12 @@ const build = async (config, callback) => {
     for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)) }
   }
 
-  let result = await esbuild.build(config.esbuild).catch(() => {});
+  let result = await getBuildResult(config);
 
-  // https://esbuild.github.io/api/#analyze
-  // -> config.metafile = true
-  // let text = await esbuild.analyzeMetafile(result.metafile)
-  // console.log(text)
+  if (config.buildOnly && config.esbuild.metafile) {
+    const metaText = await esbuild.analyzeMetafile(result.metafile)
+    console.log(metaText);
+  }
 
   const hashSum = crypto.createHash('md5');
   hashSum.update(result.outputFiles[0].contents);
