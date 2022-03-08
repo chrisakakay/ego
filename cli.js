@@ -15,10 +15,11 @@ const config = {
   staticFolder: argv.staticdir || './static',
   buildOnly: buildOnly,
   port: argv.port || 8080,
+  lint: argv.lint !== undefined,
   esbuild: {
     entryPoints: ["./src/index.jsx"],
     outdir: argv.outdir || './dist',
-    minify: argv.minify === undefined ? true : argv.minify !== 'false',
+    minify: true, //argv.minify === undefined ? true : argv.minify !== 'false',
     bundle: true,
     write: false,
     incremental: buildOnly ? false : true,
