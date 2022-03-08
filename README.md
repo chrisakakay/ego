@@ -19,6 +19,7 @@ Supported flags (configuration):
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
 - `--minify` - (default: `true`) change minification
+- `--lint` - (default: `false`) run linting on codebase
 
 Build only flags:
 - `--analyze` - (default: `false`) show a report of the bundle content

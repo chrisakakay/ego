@@ -19,7 +19,7 @@ const config = {
   esbuild: {
     entryPoints: ["./src/index.jsx"],
     outdir: argv.outdir || './dist',
-    minify: true, //argv.minify === undefined ? true : argv.minify !== 'false',
+    minify: argv.minify === undefined ? true : argv.minify !== 'false',
     bundle: true,
     write: false,
     incremental: buildOnly ? false : true,
