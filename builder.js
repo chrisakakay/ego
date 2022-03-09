@@ -59,13 +59,6 @@ const lintFiles = async (file, silent) => {
 }
 
 const init = async (config) => {
-  if (config.lint) {
-    const { ESLint } = require('eslint');
-    eslint = new ESLint();
-    eslintFormatter = await eslint.loadFormatter('stylish');
-    await lintFiles('./src/**/*.jsx', true);
-  }
-
   if (fs.existsSync(config.esbuild.outdir)) {
     await fs.emptyDirSync(config.esbuild.outdir);
   } else {
@@ -87,6 +80,15 @@ const init = async (config) => {
     chokidar.watch(config.staticFolder, { ignoreInitial: true }).on('all', (e, path) => {
       copyStaticFolder(config);
     });
+  }
+
+  build(config);
+
+  if (config.lint) {
+    const { ESLint } = require('eslint');
+    eslint = new ESLint();
+    eslintFormatter = await eslint.loadFormatter('stylish');
+    await lintFiles('./src/**/*.jsx', true);
   }
 }
 

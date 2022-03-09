@@ -31,7 +31,6 @@ const config = {
 };
 
 builder.init(config);
-builder.build(config);
 
 if (!buildOnly) {
   server.start(config);
