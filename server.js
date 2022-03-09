@@ -20,11 +20,7 @@ module.exports.start = (config) => {
     if (fs.existsSync(indexPath)) {
       ctx.body = fs.createReadStream(indexPath);
     } else {
-      ctx.body = `<html style="font-family: Arial; padding: 50px;">
-        <p style="text-align: center;">Something went wrong!</p>
-        <p style="text-align: center;">Check if the build was successful.</p>
-        <p style="text-align: center;">This page only shows if the 'index.html' is missing from the build folder.</p>
-      </html>`;
+      ctx.body = fs.createReadStream(path.join(__dirname, 'error.html'));
     }
   });
 

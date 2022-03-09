@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const crypto = require('crypto');
 const esbuild = require('esbuild');
+const server = require('./server.js');
 
 let firstBuildResult;
 const getBuildResult = async (config) => {
@@ -17,10 +18,14 @@ const build = async (config, callback) => {
   if (!config.buildOnly) {
     const files = fs.readdirSync(config.esbuild.outdir).filter(fn => fn.startsWith('index.') && fn.endsWith('.js'));
     for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)) }
+    if (path.join(config.esbuild.outdir, 'index.html')) await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
   }
 
   let result = await getBuildResult(config);
-  if (result === undefined) return;
+  if (result === undefined) {
+    if (callback) callback();
+    return;
+  }
 
   if (config.buildOnly && config.esbuild.metafile) {
     const metaText = await esbuild.analyzeMetafile(result.metafile)
@@ -47,15 +52,19 @@ const copyStaticFolder = async (config) => {
   if (fs.existsSync(config.staticFolder)) await fs.copySync(config.staticFolder, config.esbuild.outdir);
 }
 
-let eslint, eslintFormatter;
+let eslint, eslintFormatterPretty, eslintFormatterJSON;
 
-const lintFiles = async (file, silent) => {
+const lintFiles = async (config, file) => {
   const hrstart = process.hrtime();
   const results = await eslint.lintFiles([file]);
-  const resultText = eslintFormatter.format(results);
-  if (resultText) console.log(resultText);
+  const resultText = eslintFormatterPretty.format(results);
+  if (resultText) {
+    console.log(resultText);
+    const resultJSON = eslintFormatterJSON.format(results);
+    await fs.writeFileSync(path.join(config.esbuild.outdir, 'eslint.json'), resultJSON, { encoding: 'utf8' });
+  }
   const hrend = process.hrtime(hrstart);
-  if (!silent) console.info('Linted in %d.%ss', hrend[0], parseInt(hrend[1] / 1000000, 10).toString().padStart(3, '0'));
+  console.info('Linted in %d.%ss', hrend[0], parseInt(hrend[1] / 1000000, 10).toString().padStart(3, '0'));
 }
 
 const init = async (config) => {
@@ -73,7 +82,7 @@ const init = async (config) => {
     const livereloadServer = livereload.createServer();
 
     chokidar.watch('./src', { ignoreInitial: true }).on('all', (e, path) => {
-      if (config.lint) lintFiles(path);
+      if (config.lint) lintFiles(config, path);
       build(config, () => livereloadServer.refresh('/'));
     });
 
@@ -82,13 +91,24 @@ const init = async (config) => {
     });
   }
 
-  build(config);
+  await build(config);
 
   if (config.lint) {
     const { ESLint } = require('eslint');
     eslint = new ESLint();
-    eslintFormatter = await eslint.loadFormatter('stylish');
-    await lintFiles('./src/**/*.jsx', true);
+    eslintFormatterPretty = await eslint.loadFormatter('stylish');
+    eslintFormatterJSON = await eslint.loadFormatter('json');
+    await lintFiles(config, './src/**/*.jsx');
+  }
+
+  if (!config.buildOnly) {
+    server.start(config);
+
+    if (config.open) {
+      const cp = require('child_process');
+      if (process.platform === 'darwin') cp.exec(`open http://localhost:${config.port}${config.publicUrl}`);
+      if (process.platform === 'win32') cp.exec(`start http://localhost:${config.port}${config.publicUrl}`);
+    }
   }
 }
 

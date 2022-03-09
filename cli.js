@@ -2,8 +2,6 @@
 
 const yargs = require('yargs/yargs');
 const argv = yargs(process.argv.slice(2)).argv;
-
-const server = require('./server.js');
 const builder = require('./builder.js');
 
 const buildOnly = argv._[0] === 'build';
@@ -16,6 +14,7 @@ const config = {
   buildOnly: buildOnly,
   port: argv.port || 8080,
   lint: argv.lint !== undefined,
+  open: argv.open,
   esbuild: {
     entryPoints: ["./src/index.jsx"],
     outdir: argv.outdir || './dist',
@@ -31,13 +30,3 @@ const config = {
 };
 
 builder.init(config);
-
-if (!buildOnly) {
-  server.start(config);
-
-  if (argv.open) {
-    const cp = require('child_process');
-    if (process.platform === 'darwin') cp.exec(`open http://localhost:${config.port}${config.publicUrl}`);
-    if (process.platform === 'win32') cp.exec(`start http://localhost:${config.port}${config.publicUrl}`);
-  }
-}
