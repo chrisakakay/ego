@@ -19,7 +19,7 @@ Supported flags (configuration):
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
 - `--minify` - (default: `true`) change minification
-- `--lint` - (default: `false`) run linting on codebase
+- `--lint` - (default: `false`) run linting
 
 Build only flags:
 - `--analyze` - (default: `false`) show a report of the bundle content
@@ -27,7 +27,3 @@ Build only flags:
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
-
-TODO:
-- [ ] add an `init` command to create a base file structure
-- [ ] consider adding a package to handle `--open` more gracefully (currently only win/osx support)

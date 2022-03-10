@@ -61,12 +61,12 @@
         .then(response => response.json())
         .then(data => {
           console.log(data);
-          render('root', data.map(e => `
+          render('root', data.map(e => e.errorCount > 0 ? `
             <div class="error">
               <p class="path">${e.filePath}</p>
-              <p>${e.messages.length > 0 ? `<span class="line">${e.messages[0].line}</span> ${e.messages[0].message}` : ''}</p>
+              ${e.messages.map(m => `<p><span class="line">${m.line}</span> ${m.message}</p>`).join('')}
             </div>
-          `).join(''));
+          ` : '').join(''));
         });
     </script>
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>

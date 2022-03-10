@@ -18,7 +18,7 @@ const build = async (config, callback) => {
   if (!config.buildOnly) {
     const files = fs.readdirSync(config.esbuild.outdir).filter(fn => fn.startsWith('index.') && fn.endsWith('.js'));
     for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)) }
-    if (path.join(config.esbuild.outdir, 'index.html')) await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
+    await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
   }
 
   let result = await getBuildResult(config);
@@ -56,15 +56,23 @@ let eslint, eslintFormatterPretty, eslintFormatterJSON;
 
 const lintFiles = async (config, file) => {
   const hrstart = process.hrtime();
+
+  await fs.removeSync(path.join(config.esbuild.outdir, 'eslint.json'));
   const results = await eslint.lintFiles([file]);
+  const resultJSON = eslintFormatterJSON.format(results);
   const resultText = eslintFormatterPretty.format(results);
-  if (resultText) {
+  const errorCount = results.reduce((p, c) => p + c.errorCount, 0);
+
+  if (errorCount > 0) {
     console.log(resultText);
-    const resultJSON = eslintFormatterJSON.format(results);
-    await fs.writeFileSync(path.join(config.esbuild.outdir, 'eslint.json'), resultJSON, { encoding: 'utf8' });
+    await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
+    if (!config.buildOnly) await fs.writeFileSync(path.join(config.esbuild.outdir, 'eslint.json'), resultJSON, { encoding: 'utf8' });
   }
+
   const hrend = process.hrtime(hrstart);
   console.info('Linted in %d.%ss', hrend[0], parseInt(hrend[1] / 1000000, 10).toString().padStart(3, '0'));
+
+  return errorCount === 0;
 }
 
 const init = async (config) => {
@@ -81,9 +89,17 @@ const init = async (config) => {
     const livereload = require('livereload');
     const livereloadServer = livereload.createServer();
 
-    chokidar.watch('./src', { ignoreInitial: true }).on('all', (e, path) => {
-      if (config.lint) lintFiles(config, path);
-      build(config, () => livereloadServer.refresh('/'));
+    chokidar.watch('./src', { ignoreInitial: true }).on('all', async (e, path) => {
+      if (config.lint) {
+        const lintSuccess = await lintFiles(config, path);
+        if (lintSuccess) {
+          build(config, () => livereloadServer.refresh('/'));
+        } else {
+          livereloadServer.refresh('/');
+        }
+      } else {
+        build(config, () => livereloadServer.refresh('/'));
+      }
     });
 
     chokidar.watch(config.staticFolder, { ignoreInitial: true }).on('all', (e, path) => {
@@ -91,14 +107,15 @@ const init = async (config) => {
     });
   }
 
-  await build(config);
-
   if (config.lint) {
     const { ESLint } = require('eslint');
     eslint = new ESLint();
     eslintFormatterPretty = await eslint.loadFormatter('stylish');
     eslintFormatterJSON = await eslint.loadFormatter('json');
-    await lintFiles(config, './src/**/*.jsx');
+    const lintSuccess = await lintFiles(config, './src/**/*.jsx');
+    if (lintSuccess) await build(config);
+  } else {
+    await build(config);
   }
 
   if (!config.buildOnly) {
