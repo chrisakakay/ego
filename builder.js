@@ -90,7 +90,7 @@ const init = async (config) => {
     const livereloadServer = livereload.createServer();
 
     chokidar.watch('./src', { ignoreInitial: true }).on('all', async (e, path) => {
-      if (config.lint) {
+      if (config.lint && e !== 'unlink' && (path.endsWith('.js') || path.endsWith('.jsx'))) {
         const lintSuccess = await lintFiles(config, path);
         if (lintSuccess) {
           build(config, () => livereloadServer.refresh('/'));
