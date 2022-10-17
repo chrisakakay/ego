@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const esbuild = require('esbuild');
 const server = require('./server.js');
+const lint = require('./lint.js');
 
 let firstBuildResult;
 const getBuildResult = async (config) => {
@@ -10,14 +11,14 @@ const getBuildResult = async (config) => {
 
   firstBuildResult = await esbuild.build(config.esbuild).catch(() => {});
   return firstBuildResult;
-}
+};
 
 const build = async (config, callback) => {
   const hrstart = process.hrtime();
 
   if (!config.buildOnly) {
     const files = fs.readdirSync(config.esbuild.outdir).filter(fn => fn.startsWith('index.') && fn.endsWith('.js'));
-    for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)) }
+    for (const file of files) { await fs.removeSync(path.join(config.esbuild.outdir, file)); }
     await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
   }
 
@@ -28,7 +29,7 @@ const build = async (config, callback) => {
   }
 
   if (config.buildOnly && config.esbuild.metafile) {
-    const metaText = await esbuild.analyzeMetafile(result.metafile)
+    const metaText = await esbuild.analyzeMetafile(result.metafile);
     console.log(metaText);
   }
 
@@ -37,43 +38,22 @@ const build = async (config, callback) => {
   const hex = hashSum.digest('hex').slice(-8);
   fs.writeFileSync(result.outputFiles[0].path.replace('.js', `.${hex}.js`), result.outputFiles[0].contents);
 
+  /* eslint-disable quotes */
   let html = await fs.readFileSync(config.entryPoint, 'utf8');
   html = html.replace(`src="./index.jsx"`, `src="${path.join(config.publicUrl, `index.${hex}.js`)}"`);
   if (!config.buildOnly) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
   await fs.writeFileSync(path.join(config.esbuild.outdir, 'index.html'), html, { encoding: 'utf8' });
+  /* eslint-enable quotes */
 
   const hrend = process.hrtime(hrstart);
   console.info('Built in %d.%ss', hrend[0], parseInt(hrend[1] / 1000000, 10).toString().padStart(3, '0'));
 
   if (callback) callback();
-}
+};
 
 const copyStaticFolder = async (config) => {
   if (fs.existsSync(config.staticFolder)) await fs.copySync(config.staticFolder, config.esbuild.outdir);
-}
-
-let eslint, eslintFormatterPretty, eslintFormatterJSON;
-
-const lintFiles = async (config, file) => {
-  const hrstart = process.hrtime();
-
-  await fs.removeSync(path.join(config.esbuild.outdir, 'eslint.json'));
-  const results = await eslint.lintFiles([file]);
-  const resultJSON = eslintFormatterJSON.format(results);
-  const resultText = eslintFormatterPretty.format(results);
-  const errorCount = results.reduce((p, c) => p + c.errorCount, 0);
-
-  if (errorCount > 0) {
-    console.log(resultText);
-    await fs.removeSync(path.join(config.esbuild.outdir, 'index.html'));
-    if (!config.buildOnly) await fs.writeFileSync(path.join(config.esbuild.outdir, 'eslint.json'), resultJSON, { encoding: 'utf8' });
-  }
-
-  const hrend = process.hrtime(hrstart);
-  console.info('Linted in %d.%ss', hrend[0], parseInt(hrend[1] / 1000000, 10).toString().padStart(3, '0'));
-
-  return errorCount === 0;
-}
+};
 
 const init = async (config) => {
   if (fs.existsSync(config.esbuild.outdir)) {
@@ -91,29 +71,42 @@ const init = async (config) => {
 
     chokidar.watch('./src', { ignoreInitial: true }).on('all', async (e, path) => {
       if (config.lint && e !== 'unlink' && (path.endsWith('.js') || path.endsWith('.jsx'))) {
-        const lintSuccess = await lintFiles(config, path);
-        if (lintSuccess) {
-          build(config, () => livereloadServer.refresh('/'));
+        if (config.lintBlock) {
+          const lintSuccess = await lint.lintFiles(config.lintType === 'all' ? './src/**/*.jsx' : path);
+          lintSuccess ?
+            await build(config, () => livereloadServer.refresh('/')) :
+            livereloadServer.refresh('/');
         } else {
-          livereloadServer.refresh('/');
+          await build(config, () => {
+            livereloadServer.refresh('/');
+            lint.lintFilesConsole(config.lintType === 'all' ? './src/**/*.jsx' : path);
+          });
         }
       } else {
-        build(config, () => livereloadServer.refresh('/'));
+        await build(config, () => livereloadServer.refresh('/'));
       }
     });
 
-    chokidar.watch(config.staticFolder, { ignoreInitial: true }).on('all', (e, path) => {
-      copyStaticFolder(config);
-    });
+    if (fs.existsSync(config.staticFolder)) {
+      chokidar.watch(config.staticFolder, { ignoreInitial: true }).on('all', () => {
+        copyStaticFolder(config);
+      });
+    } else {
+      console.log(`ERROR: Static folder: '${config.staticFolder}' does not exists!`);
+    }
   }
 
   if (config.lint) {
-    const { ESLint } = require('eslint');
-    eslint = new ESLint();
-    eslintFormatterPretty = await eslint.loadFormatter('stylish');
-    eslintFormatterJSON = await eslint.loadFormatter('json');
-    const lintSuccess = await lintFiles(config, './src/**/*.jsx');
-    if (lintSuccess) await build(config);
+    await lint.setup(config);
+
+    if (config.lintBlock) {
+      const lintSuccess = await lint.lintFiles('./src/**/*.jsx');
+      if (lintSuccess) await build(config);
+    } else {
+      await build(config, () => {
+        lint.lintFilesConsole('./src/**/*.jsx');
+      });
+    }
   } else {
     await build(config);
   }
@@ -127,6 +120,6 @@ const init = async (config) => {
       if (process.platform === 'win32') cp.exec(`start http://localhost:${config.port}${config.publicUrl}`);
     }
   }
-}
+};
 
 module.exports = { init, build };

@@ -27,4 +27,4 @@ module.exports.start = (config) => {
   app.listen(config.port);
 
   console.log(`Starting dev server on port: ${config.port}`);
-}
+};

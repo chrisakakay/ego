@@ -5,7 +5,6 @@ const argv = yargs(process.argv.slice(2)).argv;
 const builder = require('./builder.js');
 
 const buildOnly = argv._[0] === 'build';
-let livereloadServer;
 
 const config = {
   publicUrl: argv.publicUrl || '/',
@@ -14,9 +13,11 @@ const config = {
   buildOnly: buildOnly,
   port: argv.port || 8080,
   lint: argv.lint !== undefined,
+  lintType: argv.lintType === undefined ? 'single' : argv.lintType === 'all' ? 'all': 'single',
+  lintBlock: argv.lintBlock === undefined ? true : argv.lintBlock !== 'false',
   open: argv.open,
   esbuild: {
-    entryPoints: ["./src/index.jsx"],
+    entryPoints: ['./src/index.jsx'],
     outdir: argv.outdir || './dist',
     minify: argv.minify === undefined ? true : argv.minify !== 'false',
     bundle: true,

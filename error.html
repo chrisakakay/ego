@@ -64,7 +64,11 @@
           render('root', data.map(e => e.errorCount > 0 ? `
             <div class="error">
               <p class="path">${e.filePath}</p>
-              ${e.messages.map(m => `<p><span class="line">${m.line}</span> ${m.message}</p>`).join('')}
+              ${e.messages.map(m => `
+                <p>
+                  <span class="line">${m.line}</span> ${m.message}
+                </p>
+              `).join('')}
             </div>
           ` : '').join(''));
         });
