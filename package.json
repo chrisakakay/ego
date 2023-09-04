@@ -1,9 +1,9 @@
 {
   "name": "ego",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "",
-  "main": "index.js",
-  "bin": "./cli.js",
+  "main": "src/main.js",
+  "bin": "src/bin.js",
   "dependencies": {
     "chokidar": "^3.5.3",
     "esbuild": "^0.14.13",

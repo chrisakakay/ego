@@ -20,6 +20,7 @@ Supported flags (configuration):
 - `--public-url` - (default: `/`) change the base url
 - `--minify` - (default: `true`) change minification
 - `--lint` - (default: `false`) run linting
+- `--sourcemap` - (default: `false`) generate sourcemap
 
 Build only flags:
 - `--analyze` - (default: `false`) show a report of the bundle content
@@ -27,5 +28,3 @@ Build only flags:
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
-- `--lint-type` - (default: `single`, other option: `all`) lint all on file changes or just the changed file
-- `--lint-block` - (default: `true`) failing lint will block the build and show a webpage that lists the errors

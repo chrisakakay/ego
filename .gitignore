@@ -1,5 +1,6 @@
 .cache/
 dist/
+backup/
 node_modules/
 coverage/
 .env
