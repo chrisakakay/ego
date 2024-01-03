@@ -58,7 +58,7 @@ class Orchestrator {
       });
 
       chokidar.watch('./src', { ignoreInitial: true }).on('all', async () => {
-        console.clear()
+        console.clear();
         await this.builder.devRun();
         await this.linter.run();
         this.livereloadServer.refresh('/');

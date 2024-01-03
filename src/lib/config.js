@@ -17,7 +17,7 @@ class Config {
     this.server = {
       publicUrl: argv.publicUrl || '/',
       port: argv.port || 8080,
-    }
+    };
 
     this.esbuild = {
       entryPoints: ['./src/index.jsx'],
