@@ -19,11 +19,10 @@ class Server {
     this.app.use(async ctx => { // console.log(ctx.request.url);
       ctx.type = 'html';
 
-      let indexHtml = path.join(outdir, 'index.html');
-
-      if (fs.existsSync(indexHtml)) {
+      try {
+        const indexHtml = path.join(outdir, 'index.html');
         ctx.body = fs.createReadStream(indexHtml);
-      } else {
+      } catch (err) {
         ctx.body = 'Not Found';
       }
     });
