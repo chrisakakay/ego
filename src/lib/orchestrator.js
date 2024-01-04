@@ -13,13 +13,13 @@ class Orchestrator {
       const livereload = require('livereload');
       this.server = new Server(this.config);
       this.livereloadServer = livereload.createServer();
-    }
 
-    if (this.config.ego.lint) {
-      const { Linter } = require('./linter.js');
+      if (this.config.ego.lint) {
+        const { Linter } = require('./linter.js');
 
-      this.linter = new Linter(this.config);
-      await this.linter.init();
+        this.linter = new Linter(this.config);
+        await this.linter.init();
+      }
     }
   }
 

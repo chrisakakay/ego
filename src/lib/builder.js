@@ -68,7 +68,7 @@ class Builder {
     await this.build(); stopper.click('-> build js (esbuild) \t\t');
     await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
 
-    if (this.config.esbuild.metafile) {
+    if (this.config.esbuild.metafile && this.config.ego.buildOnly) {
       await this.analyze(); stopper.click('-> analyze \t\t\t');
     }
 

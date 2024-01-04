@@ -14,18 +14,16 @@ Usage for building:
 Usage for dev env:
 - `ego --open --port 8080`
 
-Supported flags (configuration):
+Build only flags:
 - `--outdir` - (default: `./dist`) change the build folder
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
 - `--minify` - (default: `true`) change minification
-- `--lint` - (default: `false`) run linting
 - `--sourcemap` - (default: `false`) generate sourcemap
-
-Build only flags:
 - `--analyze` - (default: `false`) show a report of the bundle content
 
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
+- `--lint` - (default: `false`) run linting
 - `--lintFix` - (default: `false`, only works with --lint) run linting with auto fix
