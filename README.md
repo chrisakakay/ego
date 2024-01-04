@@ -28,3 +28,4 @@ Build only flags:
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
+- `--lintFix` - (default: `false`, only works with --lint) run linting with auto fix

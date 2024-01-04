@@ -1,23 +1,26 @@
-const fs = require('fs-extra');
-const { Server } = require('./server.js');
 const { Builder } = require('./builder.js');
-const { Linter } = require('./linter.js');
 
 class Orchestrator {
   constructor(config) {
     this.config = config;
     this.builder = new Builder(config);
-    this.linter = new Linter(config);
+    this.linter = undefined;
   }
 
   async init() {
     if (!this.config.ego.buildOnly) {
+      const { Server } = require('./server.js');
       const livereload = require('livereload');
       this.server = new Server(this.config);
       this.livereloadServer = livereload.createServer();
     }
 
-    if (this.config.ego.lint) await this.linter.init();
+    if (this.config.ego.lint) {
+      const { Linter } = require('./linter.js');
+
+      this.linter = new Linter(this.config);
+      await this.linter.init();
+    }
   }
 
   async openBrowser() {
@@ -31,14 +34,15 @@ class Orchestrator {
 
     if (this.config.ego.buildOnly) {
       await this.builder.cleanRun();
-      await this.linter.run();
 
       return;
     } else {
+      const fs = require('fs-extra');
+
       console.clear();
 
+      await this.linter.cleanRun();
       await this.builder.cleanRun();
-      await this.linter.run();
 
       const chokidar = require('chokidar');
       const { staticFolder } = this.config.ego;
@@ -57,8 +61,9 @@ class Orchestrator {
 
       chokidar.watch('./src', { ignoreInitial: true }).on('all', async () => {
         console.clear();
+        const fixed = await this.linter.run();
+        if (fixed) return;
         await this.builder.devRun();
-        await this.linter.run();
         this.livereloadServer.refresh('/');
       });
 

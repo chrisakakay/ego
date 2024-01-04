@@ -11,7 +11,8 @@ class Config {
       buildOnly: buildOnly,
       liveReload: !buildOnly,
       open: argv.open !== undefined,
-      lint: argv.lint !== undefined
+      lint: argv.lint !== undefined,
+      lintFix: argv.lintFix !== undefined,
     };
 
     this.server = {

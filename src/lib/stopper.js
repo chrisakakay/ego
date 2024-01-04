@@ -36,6 +36,11 @@ class Stopper { // process.hrtime.bigint() is nanoseconds
     return this;
   }
 
+  cancel() {
+    this.end = process.hrtime.bigint();
+    return this;
+  }
+
   toSecs(t) {
     return Number(t / BigInt(1000000000));
   }

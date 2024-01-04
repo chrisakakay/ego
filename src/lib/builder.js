@@ -76,10 +76,10 @@ class Builder {
   }
 
   async devRun() {
-    let stopper = new Stopper({ header: 'Build log:', total: 'Built in (total) \t\t' }).start();
+    let stopper = new Stopper({ total: 'Built in (total) \t\t' }).start();
 
-    await this.build(); stopper.click('-> build js (esbuild) \t\t');
-    await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
+    await this.build();
+    await this.writeResultsToFiles();
 
     stopper.stop();
   }
