@@ -1,35 +1,27 @@
-const serve = require('koa-static');
-const mount = require('koa-mount');
-const Koa = require('koa');
-const fs = require('fs-extra');
 const path = require('path');
+const express = require('express');
 
 class Server {
   constructor(config) {
-    this.app = new Koa();
+    this.app = new express();
     this.config = config;
+    this.server = undefined;
   }
 
-  start() {
+  async start() {
     let { port, publicUrl } = this.config.server;
     let { outdir } = this.config.esbuild;
 
-    this.app.use(publicUrl === '/' ? serve(outdir) : mount(publicUrl, serve(outdir)));
+    (publicUrl === '/') ?
+      this.app.use(express.static(outdir)) :
+      this.app.use(publicUrl, express.static(outdir));
 
-    this.app.use(async ctx => { // console.log(ctx.request.url);
-      ctx.type = 'html';
-
-      try {
-        const indexHtml = path.join(outdir, 'index.html');
-        ctx.body = fs.createReadStream(indexHtml);
-      } catch (err) {
-        ctx.body = 'Not Found';
-      }
+    this.app.get('*', (req, res) => {
+      res.sendFile(path.resolve(outdir, 'index.html'));
     });
 
-    this.app.listen(port);
-
-    console.log(`\nStarting dev server on port: ${port}`);
+    this.server = await this.app.listen(port);
+    console.log(`\nServer started on port: ${port}`);
   }
 }
 

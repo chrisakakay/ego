@@ -20,7 +20,7 @@ class Orchestrator {
     if (this.config.ego.lint) await this.linter.init();
   }
 
-  openBrowser() {
+  async openBrowser() {
     const cp = require('child_process');
     if (process.platform === 'darwin') cp.exec(`open http://localhost:${this.config.server.port}${this.config.server.publicUrl}`);
     if (process.platform === 'win32') cp.exec(`start http://localhost:${this.config.server.port}${this.config.server.publicUrl}`);
@@ -39,8 +39,6 @@ class Orchestrator {
 
       await this.builder.cleanRun();
       await this.linter.run();
-
-      this.server.start();
 
       const chokidar = require('chokidar');
       const { staticFolder } = this.config.ego;
@@ -64,7 +62,9 @@ class Orchestrator {
         this.livereloadServer.refresh('/');
       });
 
-      if (this.config.ego.open) this.openBrowser();
+      await this.server.start();
+
+      if (this.config.ego.open) await this.openBrowser();
     }
   }
 }
