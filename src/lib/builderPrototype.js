@@ -1,17 +1,31 @@
 const fs = require('fs-extra');
-const esbuild = require('esbuild');
 const crypto = require('crypto');
 const path = require('path');
 const { Stopper } = require('./stopper.js');
 
-class Builder {
+class BuilderPrototype {
   constructor(config) {
     this.config = config;
-    this.result = undefined;
+  }
+
+  async build() {
+    console.log('[BulderPrototype:build()] This is an empty method. Implement your logic.');
+  }
+
+  async analyze() {
+    console.log('[BulderPrototype:analyze()] This is an empty method. Implement your logic.');
+  }
+
+  async writeResultsToFiles() {
+    console.log('[BulderPrototype:writeResultsToFiles()] This is an empty method. Implement your logic. [Return a content hash]');
+  }
+
+  async cleanUp() {
+    console.log('[BulderPrototype:cleanUp()] This is an empty method. Implement your logic.');
   }
 
   async createOrEmptyDist() {
-    let { outdir } = this.config.esbuild;
+    let { outdir } = this.config.ego;
 
     if (fs.existsSync(outdir)) {
       await fs.emptyDirSync(outdir);
@@ -21,43 +35,21 @@ class Builder {
   }
 
   async copyStaticFolder() {
-    if (fs.existsSync(this.config.ego.staticFolder)) await fs.copySync(this.config.ego.staticFolder, this.config.esbuild.outdir);
+    if (fs.existsSync(this.config.ego.staticFolder)) await fs.copySync(this.config.ego.staticFolder, this.config.ego.outdir);
   }
 
-  async analyze() {
-    if (this.result) {
-      const metaText = await esbuild.analyzeMetafile(this.result.metafile);
-      console.log(metaText);
-    } else {
-      console.log('ERROR: Can not analyze build');
-    }
+  async getContentHash(content) {
+    if (!this.config.ego.buildOnly) return undefined;
+    return await crypto.createHash('md5').update(content).digest('hex').slice(-8);
   }
 
-  async writeResultsToFiles() {
-    if (!this.result) {
-      console.log('ERROR: Can not write build to fs'); return;
-    }
-
+  async writeHTMLFile(hex) {
     let { buildOnly, liveReload } = this.config.ego;
-    let { outputFiles } = this.result;
-    let hex = buildOnly ? crypto.createHash('md5').update(outputFiles.find(f => f.path.endsWith('index.js')).contents).digest('hex').slice(-8) : undefined;
-
-    for (const file of outputFiles) {
-      await fs.writeFileSync(buildOnly ? file.path.replace('.js', `.${hex}.js`) : file.path, file.contents);
-    }
 
     let html = await fs.readFileSync(this.config.ego.entryPoint, 'utf8');
     html = html.replace(`src="./index.jsx"`, `src="${path.join(this.config.server.publicUrl, buildOnly ? `index.${hex}.js` : 'index.js')}"`);
     if (liveReload) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
     await fs.writeFileSync(path.join(this.config.esbuild.outdir, 'index.html'), html, { encoding: 'utf8' });
-  }
-
-  async build() {
-    if (this.result) {
-      this.result = await this.result.rebuild().catch(() => {});
-    } else {
-      this.result = await esbuild.build(this.config.esbuild).catch(() => {});
-    }
   }
 
   async cleanRun() {
@@ -66,9 +58,10 @@ class Builder {
     await this.createOrEmptyDist(); stopper.click('-> clean dist folder \t\t');
     await this.copyStaticFolder(); stopper.click('-> static folder copy \t\t');
     await this.build(); stopper.click('-> build js (esbuild) \t\t');
-    await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
+    const hex = await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
+    await this.writeHTMLFile(hex); stopper.click('-> write html to fs \t\t');
 
-    if (this.config.esbuild.metafile && this.config.ego.buildOnly) {
+    if (this.config.ego.analyze && this.config.ego.buildOnly) {
       await this.analyze(); stopper.click('-> analyze \t\t\t');
     }
 
@@ -79,12 +72,13 @@ class Builder {
     let stopper = new Stopper({ total: 'Built in (total) \t\t' }).start();
 
     await this.build();
-    await this.writeResultsToFiles();
+    const hex = await this.writeResultsToFiles();
+    await this.writeHTMLFile(hex);
 
     stopper.stop();
   }
 }
 
 module.exports = {
-  Builder
+  BuilderPrototype
 };

@@ -1,10 +1,15 @@
-const { Builder } = require('./builder.js');
-
 class Orchestrator {
   constructor(config) {
     this.config = config;
-    this.builder = new Builder(config);
     this.linter = undefined;
+    if (config.ego.engine === 'esbuild-stable') {
+      const { Builder } = require('./builderV1.js');
+      this.builder = new Builder(config);
+    }
+    if (config.ego.engine === 'esbuild-experimental') {
+      const { Builder } = require('./builderV2.js');
+      this.builder = new Builder(config);
+    }
   }
 
   async init() {
@@ -34,6 +39,7 @@ class Orchestrator {
 
     if (this.config.ego.buildOnly) {
       await this.builder.cleanRun();
+      await this.builder.cleanUp();
 
       return;
     } else {
