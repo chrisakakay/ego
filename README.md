@@ -14,12 +14,15 @@ Usage for building:
 Usage for dev env:
 - `ego --open --port 8080`
 
-Build only flags:
+Configuration:
 - `--outdir` - (default: `./dist`) change the build folder
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
 - `--minify` - (default: `true`) change minification
 - `--sourcemap` - (default: `false`) generate sourcemap
+- `--engine` - (default: `esbuild-stable`, options: [`esbuild-stable`, `esbuild-experimental`])
+
+Build only flags:
 - `--analyze` - (default: `false`) show a report of the bundle content
 
 Dev only flags:
