@@ -9,7 +9,7 @@ class Server {
   }
 
   async start() {
-    let { port, publicUrl } = this.config.server;
+    let { port, publicUrl } = this.config.ego;
     let { outdir } = this.config.esbuild;
 
     (publicUrl === '/') ?

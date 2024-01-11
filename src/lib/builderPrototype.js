@@ -44,12 +44,14 @@ class BuilderPrototype {
   }
 
   async writeHTMLFile(hex) {
-    let { buildOnly, liveReload } = this.config.ego;
-
     let html = await fs.readFileSync(this.config.ego.entryPoint, 'utf8');
-    html = html.replace(`src="./index.jsx"`, `src="${path.join(this.config.server.publicUrl, buildOnly ? `index.${hex}.js` : 'index.js')}"`);
-    if (liveReload) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
+    html = html.replace(`src="./index.jsx"`, `src="${path.join(this.config.ego.publicUrl, this.config.ego.buildOnly ? `index.${hex}.js` : 'index.js')}"`);
+    if (this.config.ego.liveReload) html = html.replace('</body>', `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script></body>`);
     await fs.writeFileSync(path.join(this.config.esbuild.outdir, 'index.html'), html, { encoding: 'utf8' });
+  }
+
+  async writeManifest(content) {
+    await fs.writeFileSync(path.join(this.config.esbuild.outdir, 'asset-manifest.json'), JSON.stringify(content));
   }
 
   async cleanRun() {
@@ -61,7 +63,7 @@ class BuilderPrototype {
     const hex = await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
     await this.writeHTMLFile(hex); stopper.click('-> write html to fs \t\t');
 
-    if (this.config.ego.analyze && this.config.ego.buildOnly) {
+    if (this.config.ego.analyze !== '') {
       await this.analyze(); stopper.click('-> analyze \t\t\t');
     }
 
@@ -74,6 +76,7 @@ class BuilderPrototype {
     await this.build();
     const hex = await this.writeResultsToFiles();
     await this.writeHTMLFile(hex);
+    if (this.config.ego.analyze !== '') await this.analyze();
 
     stopper.stop();
   }

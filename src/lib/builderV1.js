@@ -12,7 +12,9 @@ class Builder extends BuilderPrototype {
   async cleanUp() {}
 
   async analyze() {
-    if (this.result) console.log(await esbuild.analyzeMetafile(this.result.metafile));
+    if (!this.result) return;
+    if (['save', 'all'].includes(this.config.ego.analyze)) await this.writeManifest(this.result.metafile);
+    if (['print', 'all'].includes(this.config.ego.analyze)) console.log(await esbuild.analyzeMetafile(this.result.metafile));
   }
 
   async build() {

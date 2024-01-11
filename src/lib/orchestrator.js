@@ -30,8 +30,8 @@ class Orchestrator {
 
   async openBrowser() {
     const cp = require('child_process');
-    if (process.platform === 'darwin') cp.exec(`open http://localhost:${this.config.server.port}${this.config.server.publicUrl}`);
-    if (process.platform === 'win32') cp.exec(`start http://localhost:${this.config.server.port}${this.config.server.publicUrl}`);
+    if (process.platform === 'darwin') cp.exec(`open http://localhost:${this.config.ego.port}${this.config.ego.publicUrl}`);
+    if (process.platform === 'win32') cp.exec(`start http://localhost:${this.config.ego.port}${this.config.ego.publicUrl}`);
   }
 
   async run() {

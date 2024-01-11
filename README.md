@@ -21,9 +21,7 @@ Configuration:
 - `--minify` - (default: `true`) change minification
 - `--sourcemap` - (default: `false`) generate sourcemap
 - `--engine` - (default: `esbuild-stable`, options: [`esbuild-stable`, `esbuild-experimental`])
-
-Build only flags:
-- `--analyze` - (default: `false`) show a report of the bundle content
+- `--analyze` - (default: `all`, options: [`all`, `print`, `save`] ) show a report of the bundle content
 
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
