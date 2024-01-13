@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
-const path = require('path');
+const path = require('node:path');
 const { Stopper } = require('./stopper.js');
 
 class BuilderPrototype {

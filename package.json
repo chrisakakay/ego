@@ -1,6 +1,6 @@
 {
   "name": "ego",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "",
   "main": "src/main.js",
   "bin": "src/bin.js",
@@ -11,13 +11,14 @@
     "express": "^4.18.2",
     "fs-extra": "^11.2.0",
     "livereload": "^0.9.3",
+    "svelte": "^4.2.8",
     "yargs": "^17.7.2"
   },
   "peerDependencies": {
     "eslint": "^8.56.0"
   },
   "scripts": {
-    "lint": "eslint ./ --ext .js"
+    "lint": "eslint ./src --ext .js"
   },
   "author": "Krisztian Nagy <chrisakakay@gmail.com>",
   "license": "MIT",

@@ -40,6 +40,11 @@ class Config {
         'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"',
       },
     };
+
+    if (engine === 'esbuild-svelte') {
+      const { sveltePlugin } = require('./plugins/esbuildSvelte.js');
+      this.esbuild.plugins = [sveltePlugin];
+    }
   }
 }
 
