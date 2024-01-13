@@ -6,10 +6,12 @@ class Builder extends BuilderPrototype {
   constructor(config) {
     super(config);
     this.result = undefined;
-    console.log(`[esbuild v${esbuild.version}]`);
+    this.context = undefined;
   }
 
-  async cleanUp() {}
+  async cleanUp() {
+    this.context.dispose();
+  }
 
   async analyze() {
     if (!this.result) return;
@@ -19,9 +21,10 @@ class Builder extends BuilderPrototype {
 
   async build() {
     if (this.result) {
-      this.result = await this.result.rebuild().catch(() => {});
+      this.result = await this.context.rebuild().catch(() => {});
     } else {
-      this.result = await esbuild.build(this.config.esbuild).catch(() => {});
+      this.context = await esbuild.context(this.config.esbuild).catch(() => {});
+      this.result = await this.context.rebuild();
     }
   }
 

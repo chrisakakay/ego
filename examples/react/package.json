@@ -2,8 +2,8 @@
   "name": "example-react-frontend",
   "version": "0.0.1",
   "scripts": {
-    "dev": "ego src/index.html --lint --open --port 8080 --sourcemap",
-    "build": "ego build src/index.html --sourcemap"
+    "dev": "ego src/index.html --lint --open --port 8080",
+    "build": "ego build src/index.html"
   },
   "license": "UNLICENSED",
   "dependencies": {

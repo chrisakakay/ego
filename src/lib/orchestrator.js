@@ -1,15 +1,10 @@
+const { Builder } = require('./builderEsbuild.js');
+
 class Orchestrator {
   constructor(config) {
     this.config = config;
     this.linter = undefined;
-    if (config.ego.engine === 'esbuild-stable') {
-      const { Builder } = require('./builderV1.js');
-      this.builder = new Builder(config);
-    }
-    if (config.ego.engine === 'esbuild-experimental') {
-      const { Builder } = require('./builderV2.js');
-      this.builder = new Builder(config);
-    }
+    this.builder = new Builder(config);
   }
 
   async init() {
@@ -50,20 +45,17 @@ class Orchestrator {
       await this.linter.cleanRun();
       await this.builder.cleanRun();
 
-      const chokidar = require('chokidar');
-      const { staticFolder } = this.config.ego;
-
-      if (!fs.existsSync(staticFolder)) {
-        console.log(`ERROR: Static folder: '${staticFolder}' does not exists!`); return;
-      }
-
       if (!fs.existsSync('./src')) {
         console.log(`ERROR: source folder: './src' does not exists!`); return;
       }
 
-      chokidar.watch(staticFolder, { ignoreInitial: true }).on('all', async () => {
-        await this.builder.copyStaticFolder();
-      });
+      const chokidar = require('chokidar');
+
+      if (!this.config.ego.skipStaticFolder) {
+        chokidar.watch(this.config.ego.staticFolder, { ignoreInitial: true }).on('all', async () => {
+          await this.builder.copyStaticFolder();
+        });
+      }
 
       chokidar.watch('./src', { ignoreInitial: true }).on('all', async () => {
         console.clear();

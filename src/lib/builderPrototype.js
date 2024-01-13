@@ -35,7 +35,7 @@ class BuilderPrototype {
   }
 
   async copyStaticFolder() {
-    if (fs.existsSync(this.config.ego.staticFolder)) await fs.copySync(this.config.ego.staticFolder, this.config.ego.outdir);
+    if (!this.config.ego.skipStaticFolder) await fs.copySync(this.config.ego.staticFolder, this.config.ego.outdir);
   }
 
   async getContentHash(content) {
@@ -55,16 +55,16 @@ class BuilderPrototype {
   }
 
   async cleanRun() {
-    let stopper = new Stopper({ header: 'Build log:', total: 'Built in (total) \t\t' }).start();
+    let stopper = new Stopper({ total: 'Built in (total) \t\t' }).start();
 
-    await this.createOrEmptyDist(); stopper.click('-> clean dist folder \t\t');
-    await this.copyStaticFolder(); stopper.click('-> static folder copy \t\t');
-    await this.build(); stopper.click('-> build js (esbuild) \t\t');
-    const hex = await this.writeResultsToFiles(); stopper.click('-> write files to fs \t\t');
-    await this.writeHTMLFile(hex); stopper.click('-> write html to fs \t\t');
+    await this.createOrEmptyDist();
+    await this.copyStaticFolder();
+    await this.build();
+    const hex = await this.writeResultsToFiles();
+    await this.writeHTMLFile(hex);
 
     if (this.config.ego.analyze !== '') {
-      await this.analyze(); stopper.click('-> analyze \t\t\t');
+      await this.analyze();
     }
 
     stopper.stop();

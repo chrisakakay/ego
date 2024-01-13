@@ -18,9 +18,8 @@ Configuration:
 - `--outdir` - (default: `./dist`) change the build folder
 - `--staticdir` - (default: `./static`) change the static folder
 - `--public-url` - (default: `/`) change the base url
-- `--minify` - (default: `true`) change minification
-- `--sourcemap` - (default: `false`) generate sourcemap
-- `--engine` - (default: `esbuild-stable`, options: [`esbuild-stable`, `esbuild-experimental`])
+- `--sourcemap` - (default: `true`) generate sourcemap
+- `--engine` - (default: `esbuild-standard`, options: [`esbuild-standard`, `esbuild-svelte`])
 - `--analyze` - (default: `all`, options: [`all`, `print`, `save`] ) show a report of the bundle content
 
 Dev only flags:

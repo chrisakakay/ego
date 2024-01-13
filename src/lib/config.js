@@ -1,14 +1,13 @@
 const yargs = require('yargs/yargs');
+const fs = require('fs-extra');
 
 class Config {
   constructor() {
     const argv = yargs(process.argv.slice(2)).argv;
     const buildOnly = argv._[0] === 'build';
     const outdir = argv.outdir || './dist';
-    const engine = argv.engine || 'esbuild-stable'; // esbuild-stable, esbuild-experimental
+    const engine = argv.engine || 'esbuild-standard'; // esbuild-standard, esbuild-svelte
     const analyze = argv.analyze === true ? 'all' : (argv.analyze || '');
-
-    console.log(analyze);
 
     this.ego = {
       entryPoint: './src/index.html',
@@ -25,24 +24,22 @@ class Config {
       port: argv.port || 8080,
     };
 
-    if (engine.startsWith('esbuild')) {
-      this.esbuild = {
-        entryPoints: ['./src/index.jsx'],
-        outdir: outdir,
-        minify: argv.minify === undefined ? true : argv.minify !== 'false',
-        bundle: true,
-        write: false,
-        metafile: analyze !== '',
-        sourcemap: argv.sourcemap === undefined ? false :  argv.sourcemap !== 'false',
-        define: {
-          'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"',
-        },
-      };
-
-      if (engine === 'esbuild-stable') {
-        this.esbuild.incremental = buildOnly ? false : true;
-      }
+    if (!fs.existsSync(this.ego.staticFolder)) {
+      this.ego.skipStaticFolder = true;
     }
+
+    this.esbuild = {
+      entryPoints: ['./src/index.jsx'],
+      outdir: outdir,
+      minify: buildOnly ? true : false,
+      bundle: true,
+      write: false,
+      metafile: analyze !== '',
+      sourcemap: argv.sourcemap === 'false' ? false : true,
+      define: {
+        'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"',
+      },
+    };
   }
 }
 
