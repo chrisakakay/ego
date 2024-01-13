@@ -1,21 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { MainContent } from '../app.style.jsx';
 
-class Page404 extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {};
-  }
-
-  componentDidMount() {
+const Page404 = () => {
+  useEffect(() => {
     document.title = 'Page not found: 404';
-  }
+  }, []);
 
-  render() {
-    return (
+  return (
+    <MainContent>
       <div>404</div>
-    );
-  }
-}
+    </MainContent>
+  );
+};
 
 export default Page404;

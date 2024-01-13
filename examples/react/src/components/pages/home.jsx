@@ -1,21 +1,19 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import { AppContext } from '../app.jsx';
+import { MainContent } from '../app.style.jsx';
 
-class Home extends React.Component {
-  constructor() {
-    super();
+const Home = () => {
+  const context = useContext(AppContext);
 
-    this.state = {};
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     document.title = 'Home';
-  }
+  }, []);
 
-  render() {
-    return (
-      <div>Home</div>
-    );
-  }
-}
+  return (
+    <MainContent>
+      <div>Hello {context.user.name} ({context.user.email})</div>
+    </MainContent>
+  );
+};
 
 export default Home;

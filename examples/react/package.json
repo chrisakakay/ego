@@ -1,0 +1,21 @@
+{
+  "name": "example-react-frontend",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "ego src/index.html --lint --open --port 8080 --sourcemap",
+    "build": "ego build src/index.html --sourcemap"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ego": "chrisakakay/ego#0.19.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1",
+    "styled-components": "^6.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.33.2"
+  }
+}

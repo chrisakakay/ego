@@ -1,31 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {  } from './configuration.jsx';
 
 export const AppContext = React.createContext({});
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+const App = ({ children }) => {
+  const [user, setUser] = useState({ name: '', email: '' });
 
-    this.state = {};
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     // run auth here
-    this.setState({});
-  }
+    setUser({ name: 'World', email: 'hello@world.com' });
+  }, []);
 
-  render() {
-    const value = {
-      ...this.state,
-    };
-
-    return (
-      <AppContext.Provider value={value}>
-        {this.props.children}
-      </AppContext.Provider>
-    );
-  }
-}
+  return (
+    <AppContext.Provider value={{
+      user
+    }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
 
 export default App;
