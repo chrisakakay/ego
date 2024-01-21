@@ -47,7 +47,7 @@ class Orchestrator {
 
       if (this.config.ego.clearConsole) console.clear();
 
-      await this.linter.cleanRun();
+      if (this.config.ego.lint) await this.linter.cleanRun();
       await this.builder.cleanRun();
 
       if (!fs.existsSync('./src')) {
@@ -64,8 +64,10 @@ class Orchestrator {
 
       chokidar.watch('./src', { ignoreInitial: true }).on('all', async () => {
         if (this.config.ego.clearConsole) console.clear();
-        const fixed = await this.linter.run();
-        if (fixed) return;
+        if (this.config.ego.lint) {
+          const fixed = await this.linter.run();
+          if (fixed) return;
+        }
         await this.builder.devRun();
         this.livereloadServer.refresh('/');
       });

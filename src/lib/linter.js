@@ -7,9 +7,8 @@ class Linter {
   }
 
   async init() {
-    if (!this.config.ego.lint) return;
-
     const { ESLint } = require('eslint');
+    // TODO: This might be unneccesary as currently prod builds dont run lints anyway
     this.eslint = new ESLint(this.config.ego.buildOnly ? {} : { cache: true });
     this.eslintFix = new ESLint(this.config.ego.buildOnly ? {} : { cache: true, fix: true });
     this.formatter = {
@@ -50,8 +49,6 @@ class Linter {
   }
 
   async run(file = './src/**/*.jsx') {
-    if (!this.config.ego.lint) return;
-
     let stopper = new Stopper({total: 'Linted in (total) \t\t' }).start();
 
     await this.lint(file);
@@ -68,8 +65,6 @@ class Linter {
   }
 
   async cleanRun(file = './src/**/*.jsx') {
-    if (!this.config.ego.lint) return;
-
     let stopper = new Stopper({total: 'Linted in (total) \t\t' }).start();
 
     await this.lint(file);

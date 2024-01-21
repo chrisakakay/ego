@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 
 class Config {
   constructor(argv) {
-    const buildOnly = argv._[0] === 'build';
+    const buildOnly = Array.isArray(argv._) && argv._[0] === 'build';
     const outdir = argv.outdir || './dist';
     const engine = argv.engine || 'esbuild-standard'; // esbuild-standard, esbuild-svelte
     const analyze = argv.analyze === true ? 'all' : (argv.analyze || '');
