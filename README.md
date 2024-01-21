@@ -22,6 +22,7 @@ Configuration:
 - `--engine` - (default: `esbuild-standard`, options: [`esbuild-standard`, `esbuild-svelte`])
 - `--analyze` - (default: `all`, options: [`all`, `print`, `save`] ) show a report of the bundle content
 - `--host` - (default: `true`) starts a webserver hosting the app
+- `--clear-console` - (default: `true`) clears the console on new events
 
 Dev only flags:
 - `--port` - (default: `8080`) dev server port

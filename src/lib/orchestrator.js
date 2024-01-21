@@ -45,7 +45,7 @@ class Orchestrator {
     } else {
       const fs = require('fs-extra');
 
-      console.clear();
+      if (this.config.ego.clearConsole) console.clear();
 
       await this.linter.cleanRun();
       await this.builder.cleanRun();
@@ -63,7 +63,7 @@ class Orchestrator {
       }
 
       chokidar.watch('./src', { ignoreInitial: true }).on('all', async () => {
-        console.clear();
+        if (this.config.ego.clearConsole) console.clear();
         const fixed = await this.linter.run();
         if (fixed) return;
         await this.builder.devRun();

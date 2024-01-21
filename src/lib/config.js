@@ -1,4 +1,3 @@
-
 const fs = require('fs-extra');
 
 class Config {
@@ -22,6 +21,7 @@ class Config {
       publicUrl: argv.publicUrl || '/',
       port: argv.port || 8080,
       host: argv.host === 'false' ? false : true,
+      clearConsole: argv.clearConsole === 'false' ? false : true,
     };
 
     if (!fs.existsSync(this.ego.staticFolder)) {
