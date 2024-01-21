@@ -8,19 +8,14 @@ class Linter {
 
   async init() {
     const { ESLint } = require('eslint');
-    // TODO: This might be unneccesary as currently prod builds dont run lints anyway
-    this.eslint = new ESLint(this.config.ego.buildOnly ? {} : { cache: true });
-    this.eslintFix = new ESLint(this.config.ego.buildOnly ? {} : { cache: true, fix: true });
-    this.formatter = {
-      pretty: await this.eslint.loadFormatter('stylish'),
-      //json: await eslint.loadFormatter('json')
-    };
+    this.eslint = new ESLint({ cache: true });
+    this.eslintFix = new ESLint({ cache: true, fix: true });
+    this.formatter = { pretty: await this.eslint.loadFormatter('stylish') };
     this.write = async (f) => await ESLint.outputFixes(f);
   }
 
   async format(results) {
     return {
-      //resultJSON: eslintFormatterJSON.format(this.results),
       resultText: this.formatter.pretty.format(results),
       errorCount: results.reduce((p, c) => p + c.errorCount, 0)
     };
@@ -31,7 +26,7 @@ class Linter {
   }
 
   async fix(file) {
-    if (!this.config.ego.lintFix) return false;
+    if (!this.config.ego.lint === 'fix') return false;
 
     const fixable = this.results.reduce((p, c) => p + c.fixableErrorCount + c.fixableWarningCount, 0);
 

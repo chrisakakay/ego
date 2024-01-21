@@ -6,6 +6,7 @@ class Config {
     const outdir = argv.outdir || './dist';
     const engine = argv.engine || 'esbuild-standard'; // esbuild-standard, esbuild-svelte
     const analyze = argv.analyze === true ? 'all' : (argv.analyze || '');
+    const lint = argv.lint === undefined ? '' : (argv.lint || 'warn');
 
     this.ego = {
       entryPoint: './src/index.html',
@@ -14,14 +15,13 @@ class Config {
       buildOnly: buildOnly,
       liveReload: !buildOnly,
       open: argv.open !== undefined,
-      lint: argv.lint !== undefined,
-      lintFix: argv.lintFix !== undefined,
+      lint: lint,
       analyze: analyze,
       engine: engine,
       publicUrl: argv.publicUrl || '/',
       port: argv.port || 8080,
-      host: argv.host === 'false' ? false : true,
-      clearConsole: argv.clearConsole === 'false' ? false : true,
+      host: argv.host === 'false' || argv.host === false ? false : true,
+      clearConsole: argv.clearConsole === 'false' || argv.clearConsole === false ? false : true,
     };
 
     if (!fs.existsSync(this.ego.staticFolder)) {
@@ -35,7 +35,7 @@ class Config {
       bundle: true,
       write: false,
       metafile: analyze !== '',
-      sourcemap: argv.sourcemap === 'false' ? false : true,
+      sourcemap: argv.sourcemap === 'false' argv.sourcemap === false ? false : true,
       define: {
         'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"',
       },

@@ -20,12 +20,11 @@ Configuration:
 - `--public-url` - (default: `/`) change the base url
 - `--sourcemap` - (default: `true`) generate sourcemap
 - `--engine` - (default: `esbuild-standard`, options: [`esbuild-standard`, `esbuild-svelte`])
-- `--analyze` - (default: `all`, options: [`all`, `print`, `save`] ) show a report of the bundle content
+- `--analyze` - (default: `all`, options: [`all`, `print`, `save`]) show a report of the bundle content
 - `--host` - (default: `true`) starts a webserver hosting the app
 - `--clear-console` - (default: `true`) clears the console on new events
 
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
-- `--lint` - (default: `false`) run linting
-- `--lintFix` - (default: `false`, only works with --lint) run linting with auto fix
+- `--lint` - (default: off, options: [``, `warn`, `lint`]) run linting
