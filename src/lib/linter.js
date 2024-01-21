@@ -26,7 +26,7 @@ class Linter {
   }
 
   async fix(file) {
-    if (!this.config.ego.lint === 'fix') return false;
+    if (this.config.ego.lint !== 'fix') return false;
 
     const fixable = this.results.reduce((p, c) => p + c.fixableErrorCount + c.fixableWarningCount, 0);
 

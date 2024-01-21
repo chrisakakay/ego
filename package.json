@@ -1,6 +1,6 @@
 {
   "name": "ego",
-  "version": "0.25.1",
+  "version": "0.25.2",
   "description": "",
   "main": "src/main.js",
   "bin": "src/bin.js",
