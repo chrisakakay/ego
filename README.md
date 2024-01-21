@@ -27,4 +27,4 @@ Configuration:
 Dev only flags:
 - `--port` - (default: `8080`) dev server port
 - `--open` - (default: `false`) opening the page in a browser
-- `--lint` - (default: off, options: [``, `warn`, `lint`]) run linting
+- `--lint` - (default: off, options: [` `, `warn`, `lint`]) run linting
