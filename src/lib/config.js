@@ -35,7 +35,7 @@ class Config {
       bundle: true,
       write: false,
       metafile: analyze !== '',
-      sourcemap: argv.sourcemap === 'false' argv.sourcemap === false ? false : true,
+      sourcemap: argv.sourcemap === 'false' || argv.sourcemap === false ? false : true,
       define: {
         'process.env.NODE_ENV': buildOnly ? '"production"' : '"development"',
       },
