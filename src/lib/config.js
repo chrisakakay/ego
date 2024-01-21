@@ -1,9 +1,8 @@
-const yargs = require('yargs/yargs');
+
 const fs = require('fs-extra');
 
 class Config {
-  constructor() {
-    const argv = yargs(process.argv.slice(2)).argv;
+  constructor(argv) {
     const buildOnly = argv._[0] === 'build';
     const outdir = argv.outdir || './dist';
     const engine = argv.engine || 'esbuild-standard'; // esbuild-standard, esbuild-svelte
@@ -22,6 +21,7 @@ class Config {
       engine: engine,
       publicUrl: argv.publicUrl || '/',
       port: argv.port || 8080,
+      host: argv.host === 'false' ? false : true,
     };
 
     if (!fs.existsSync(this.ego.staticFolder)) {

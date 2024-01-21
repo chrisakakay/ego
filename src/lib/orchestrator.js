@@ -5,14 +5,19 @@ class Orchestrator {
     this.config = config;
     this.linter = undefined;
     this.builder = new Builder(config);
+    this.sever = undefined;
   }
 
   async init() {
     if (!this.config.ego.buildOnly) {
-      const { Server } = require('./server.js');
+
       const livereload = require('livereload');
-      this.server = new Server(this.config);
       this.livereloadServer = livereload.createServer();
+
+      if (this.config.ego.host) {
+        const { Server } = require('./server.js');
+        this.server = new Server(this.config);
+      }
 
       if (this.config.ego.lint) {
         const { Linter } = require('./linter.js');
@@ -65,7 +70,7 @@ class Orchestrator {
         this.livereloadServer.refresh('/');
       });
 
-      await this.server.start();
+      if (this.config.ego.host) await this.server.start();
 
       if (this.config.ego.open) await this.openBrowser();
     }
